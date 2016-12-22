@@ -16,6 +16,8 @@ class FeedViewController: UIViewController {
     
     let pathfinder = Pathfinder()
     
+    let wxScanner = WxScanner()
+    
     // 1
     let collectionView: IGListCollectionView = {
         // 2
@@ -67,19 +69,41 @@ class FeedViewController: UIViewController {
 extension FeedViewController: IGListAdapterDataSource {
     // 1
     func objects(for listAdapter: IGListAdapter) -> [IGListDiffable] {
-//        return loader.entries
-        var items: [IGListDiffable] = pathfinder.messages
+        // 1
+        var items: [IGListDiffable] = [wxScanner.currentWeather]
         items += loader.entries as [IGListDiffable]
-        return items
+        items += pathfinder.messages as [IGListDiffable]
+        // 2
+        return items.sorted(by: { (left: Any, right: Any) -> Bool in
+            if let left = left as? DateSortable, let right = right as? DateSortable {
+                return left.date > right.date
+            }
+            return false
+        })
+        
+//        return loader.entries
+        
+//        var items: [IGListDiffable] = pathfinder.messages
+//        items += loader.entries as [IGListDiffable]
+//        return items
     }
     
     // 2
     func listAdapter(_ listAdapter: IGListAdapter, sectionControllerFor object: Any) -> IGListSectionController {
         if object is Message {
             return MessageSectionController()
+        } else if object is Weather {
+            return WeatherSectionController()
         } else {
             return JournalSectionController()
         }
+        
+//        if object is Message {
+//            return MessageSectionController()
+//        } else {
+//            return JournalSectionController()
+//        }
+        
 //        return JournalSectionController()
 //        return IGListSectionController()
     }
