@@ -13,6 +13,9 @@ class FeedViewController: UIViewController {
     
     let loader = JournalEntryLoader()
     
+    
+    let pathfinder = Pathfinder()
+    
     // 1
     let collectionView: IGListCollectionView = {
         // 2
@@ -64,12 +67,20 @@ class FeedViewController: UIViewController {
 extension FeedViewController: IGListAdapterDataSource {
     // 1
     func objects(for listAdapter: IGListAdapter) -> [IGListDiffable] {
-        return loader.entries
+//        return loader.entries
+        var items: [IGListDiffable] = pathfinder.messages
+        items += loader.entries as [IGListDiffable]
+        return items
     }
     
     // 2
     func listAdapter(_ listAdapter: IGListAdapter, sectionControllerFor object: Any) -> IGListSectionController {
-        return JournalSectionController()
+        if object is Message {
+            return MessageSectionController()
+        } else {
+            return JournalSectionController()
+        }
+//        return JournalSectionController()
 //        return IGListSectionController()
     }
     
